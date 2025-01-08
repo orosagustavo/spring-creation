@@ -1,6 +1,6 @@
 # Define particle
 class Particle:
-    def __init__(self, x, y, type_mol = 1):
+    def __init__(self, x, y, vx=0, vy=0, type_mol = 1, ax = 0, ay = 0):
         if type_mol == 1:
             # Particle Type
             self.type_mol = 'P'
@@ -12,8 +12,12 @@ class Particle:
         self.y = y
 
         # Speed
-        self.vx = 0
-        self.vy = 0
+        self.vx = vx
+        self.vy = vy
+
+        # Accelerations
+        self.ax = ax
+        self.ay = ay
         
     # Visualization on print
     def __repr__(self):
