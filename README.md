@@ -22,7 +22,8 @@ where:
 ### Numerical Calculation of the Equations
 With the differential equation defined, we reduce it to first order by considering $\frac{d \vec{r}'}{dt} = v$. Using this, we can directly compute the acceleration of each particle with Newton's second law:
 
-$$a^{(n)}_{i} = \frac{F^{(n)}_{i} - F_{damp_{i}}^{(n)}}{m^{(n)}}$$
+$$a_i^{(n)} = \frac{F_i^{(n)} - F_{\text{damp}, i}^{(n)}}{m^{(n)}}$$
+
 
 where:
 - $n$ corresponds to the particle
