@@ -11,18 +11,18 @@ X_INTERVAL = (-5, 5)
 Y_INTERVAL = (-5, 5)
 
 # Defining spring constants
-NATURAL_DISTANCE = 10
-K_SPRING = 5
+NATURAL_DISTANCE = 9
+K_SPRING = 20
 
 B_DAMP = 0.1
 
 # Defining particles
-# particle1 = SRP.generate_particle(X_INTERVAL, Y_INTERVAL, type_mol=1)
-particle1 = Particle(-3.000, 0.000, vx=3)
+particle1 = SRP.generate_particle(X_INTERVAL, Y_INTERVAL, type_mol=1)
+# particle1 = Particle(-3.000, 0.000, vx=-3)
 mass1 = 1
 
-# particle2 = SRP.generate_particle(X_INTERVAL, Y_INTERVAL, type_mol=3)
-particle2 = Particle(0.000, 0.000, vx=-3)
+particle2 = SRP.generate_particle(X_INTERVAL, Y_INTERVAL, type_mol=3)
+# particle2 = Particle(0.000, 0.000, vx=3)
 mass2 = 1
 
 particles = [particle1, particle2]
