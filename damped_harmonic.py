@@ -34,7 +34,6 @@ open(output_file, "w").close() # Clean output file
 
 # Start loop
 for step in range(TOTAL_STEPS):
-    print(particle2.ay)
     if step == 0:
         SRP.xyz_file_writer(output_file, particles, step)
     
