@@ -6,8 +6,8 @@ contains
         real, intent(in) :: x1, y1, x2, y2
         real, intent(out) ::  dx, dy
 
-        dx = x2 - x1
-        dy = y2 - y1
+        dx = x1 - x2
+        dy = y1 - y2
         
     end subroutine relative_vector
 
@@ -20,15 +20,15 @@ contains
         particle_distance = sqrt(dx**2 + dy**2)
         delta_distance = particle_distance - natural_distance
         
-        if ( particle_distance == 0 ) then
-            fx = 0
-            fy = 0
+        if ( particle_distance < 1.0e-6 ) then
+            fx = 1.0e-6
+            fy = 1.0e-6
         end if
         ! Calculate force
         force = -k_mol * delta_distance
         ! Normalized directional vector
         fx = force * (dx / particle_distance)
-        fy = force * (dx / particle_distance)
+        fy = force * (dy / particle_distance)
 
     end subroutine spring_force
 
