@@ -32,17 +32,16 @@ contains
 
     end subroutine spring_force
 
-    subroutine damped_string_acc(vx, vy, fx, fy, b, mass, ax, ay)
+    subroutine damped_string_acc(vx, vy, fx, fy, b, mass, n, ax, ay)
         implicit none
         ! Entradas
-        real, dimension(:), intent(in) :: vx, vy, mass
+        integer, intent(in) :: n
+        real, dimension(n), intent(in) :: vx, vy, mass
         real, intent(in) :: fx, fy, b
-        real, dimension(:), intent(out) :: ax, ay
+        real, dimension(n), intent(out) :: ax, ay
         
-        real, dimension(size(vx)) :: f_damps_x, f_damps_y
-        integer :: i, n
-
-        n = size(vx)
+        real, dimension(n) :: f_damps_x, f_damps_y
+        integer :: i
     
         do i = 1, n
             ! Damping forces
@@ -61,5 +60,40 @@ contains
             end if
         end do
     end subroutine damped_string_acc
+
+    subroutine velocities(ax, ay, ax_0, ay_0, vx_0, vy_0, dt, n, vx, vy)
+        implicit none
+
+        integer, intent(in) :: n
+        real, dimension(n), intent(in) :: ax, ay, ax_0, ay_0 
+        real, dimension(n), intent(in) :: vx_0, vy_0
+        real, intent(in) :: dt
+        real, dimension(n), intent(out) :: vx, vy
+
+        integer :: i
+
+        do i = 1, n
+            vx(i) = vx_0(i) + 0.5 * (ax(i) + ax_0(i)) * dt
+            vy(i) = vy_0(i) + 0.5 * (ay(i) + ay_0(i)) * dt
+        end do
+
+    end subroutine velocities
+
+    subroutine position(x_0, y_0, vx, vy, ax, ay, dt, n, x, y)
+        implicit none
+
+        integer, intent(in) :: n
+        real, dimension(n), intent(in) :: x_0, y_0, vx, vy, ax, ay 
+        real, intent(in) :: dt
+        real, dimension(n), intent(out) :: x, y
+
+        integer :: i
+
+        do i = 1, n
+            x(i) = x_0(i) + vx(i) * dt + 0.5 * ax(i) * dt**2
+            y(i) = y_0(i) + vy(i) * dt + 0.5 * ay(i) * dt**2
+        end do
+
+    end subroutine position
         
 end module subrotinas
