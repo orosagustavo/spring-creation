@@ -73,8 +73,8 @@ def damped_string_acc(particles, natural_distance, k, b, masses):
     # Loop to update accelerations
     for i, particle in enumerate(particles):
             # Accelerations
-            particle.ax = (fx - f_damps[i][0]) / masses[i] if i == 0 else -(fx - f_damps[i][0]) / masses[i]
-            particle.ay = (fy - f_damps[i][1]) / masses[i] if i == 0 else -(fy - f_damps[i][1]) / masses[i]
+            particle.ax = (fx - f_damps[i][0]) / masses[i] if i == 0 else (-fx - f_damps[i][0]) / masses[i]
+            particle.ay = (fy - f_damps[i][1]) / masses[i] if i == 0 else (-fy - f_damps[i][1]) / masses[i]
 
 def update_damped_positions(particles, dt):
     # Calculating positions

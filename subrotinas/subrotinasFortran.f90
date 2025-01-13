@@ -42,7 +42,7 @@ contains
         
         real, dimension(n) :: f_damps_x, f_damps_y
         integer :: i
-    
+        
         do i = 1, n
             ! Damping forces
             f_damps_x(i) = b * vx(i)
@@ -55,8 +55,8 @@ contains
                 ax(i) = (fx - f_damps_x(i)) / mass(i)
                 ay(i) = (fy - f_damps_y(i)) / mass(i)
             else
-                ax(i) = -(fx - f_damps_x(i)) / mass(i)
-                ay(i) = -(fy - f_damps_y(i)) / mass(i)
+                ax(i) = (-fx - f_damps_x(i)) / mass(i)
+                ay(i) = (-fy - f_damps_y(i)) / mass(i)
             end if
         end do
     end subroutine damped_string_acc
