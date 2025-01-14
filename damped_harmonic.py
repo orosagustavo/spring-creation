@@ -17,12 +17,12 @@ K_SPRING = 20
 B_DAMP = 0.1
 
 # Defining particles
-particle1 = SRP.generate_particle(X_INTERVAL, Y_INTERVAL, type_mol=1)
-# particle1 = Particle(-3.000, 0.000, vx=-3)
+# particle1 = SRP.generate_particle(X_INTERVAL, Y_INTERVAL, type_mol=1)
+particle1 = Particle(3.000, 0.000)
 mass1 = 1
 
-particle2 = SRP.generate_particle(X_INTERVAL, Y_INTERVAL, type_mol=3)
-# particle2 = Particle(0.000, 0.000, vx=3)
+# particle2 = SRP.generate_particle(X_INTERVAL, Y_INTERVAL, type_mol=3)
+particle2 = Particle(1.000, 2.000)
 mass2 = 1
 
 particles = [particle1, particle2]
@@ -34,7 +34,6 @@ open(output_file, "w").close() # Clean output file
 
 # Start loop
 for step in range(TOTAL_STEPS):
-    print(particle2.ay)
     if step == 0:
         SRP.xyz_file_writer(output_file, particles, step)
     
