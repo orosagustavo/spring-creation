@@ -1,88 +1,85 @@
+import random
 import tensorflow as tf
 import numpy as np
-import subrotinas.subrotinas_tf as SRTF
+import subrotinas.subrotinas_tf as SRTF 
+import subrotinas.subrotinas_hybrid as SRH
 from tqdm import tqdm
+from particle import Particle 
 
 # --- Configurações da Simulação ---
-# Definindo passos de tempo
-DT = 0.001
-TOTAL_STEPS = 10000
-
-# Definindo o número de partículas
-NUM_PARTICLES = 120
-
-# Definindo constantes da mola
-NATURAL_DISTANCE = 7.0
-K_SPRING = 2.0
+DT = 0.01
+TOTAL_STEPS = 7000
+NUM_PARTICLES = 100
+NATURAL_DISTANCE = 5.0
+# K_SPRINGS = [0.1, 0.05, 0.01, 0.005, 0.001, 0.0001]
+K_SPRING = 0.1
 B_DAMP = 0.1
-
-# Distância mínima para força repulsiva
 MIN_PARTICLE_DISTANCE = 1.0
 
-# --- Inicialização do Sistema com TensorFlow ---
+# --- Inicialização do Sistema via Objetos ---
+#Crie a lista de objetos Particle
+particles = []
+initial_x = 0.0
+for i in range(NUM_PARTICLES):
+    if i == 0:
+        particles.append(Particle(-3, 5, type_mol=1))
+    # random_number = random.uniform(0, 2)
+    particles.append(Particle(initial_x + i *  NATURAL_DISTANCE, 0, type_mol=1))
 
-# Posições iniciais: Partículas em linha no eixo X
-initial_x = tf.range(NUM_PARTICLES, dtype=tf.float32) * NATURAL_DISTANCE
-initial_y = tf.zeros(NUM_PARTICLES, dtype=tf.float32)
-# `positions` é um tensor tf.Variable de shape (NUM_PARTICLES, 2)
-positions = tf.Variable(tf.stack([initial_x, initial_y], axis=1))
+# Adicionar perturbação inicial (modificando o objeto diretamente)
+particles[0].vx = - 15.0
+particles[0].vy = 25
 
-# Velocidades iniciais (todas em repouso)
-velocities = tf.Variable(tf.zeros((NUM_PARTICLES, 2), dtype=tf.float32))
+# 2. Crie os tensores do TensorFlow a partir da lista de objetos.
+positions_tf, velocities_tf, accelerations_tf, masses_tf = SRH.initialize_tensors_from_objects(particles)
 
-# Massas das partículas
-mass_per_particle = 1.0
-masses = tf.constant([mass_per_particle] * NUM_PARTICLES, dtype=tf.float32)
-
-# -- Adicionar perturbação inicial --
-# Modifica a velocidade da primeira partícula
-# Usa-se `tf.tensor_scatter_nd_update` para atualizar um elemento específico do tensor
-indices = tf.constant([[0]]) # Índice da partícula 0
-updates = tf.constant([[10.0, 0.0]]) # Nova velocidade [vx, vy]
-velocities.assign(tf.tensor_scatter_nd_update(velocities, indices, updates))
-
-# Aceleração inicial (começa em zero, será calculada no primeiro passo)
-accelerations = tf.Variable(tf.zeros((NUM_PARTICLES, 2), dtype=tf.float32))
-
-# Listas para armazenar dados para o gráfico
+# Listas para o gráfico
 time_points = []
 relative_distances_history = []
 
-# Cria arquivo de saída
-output_file = SRTF.create_output_folder()
-open(output_file, "w").close() # Limpa o arquivo
+# Setup do arquivo de saída
+output_file = SRH.create_output_folder()
+open(output_file, "w").close()
 
-print(f"Simulando {NUM_PARTICLES} partículas com TensorFlow...")
+print(f"Simulando {NUM_PARTICLES} partículas com a abordagem Híbrida (OO + TF)...")
 
-# --- Loop de Simulação ---
+# --- Loop de Simulação Híbrido ---
 for step in tqdm(range(TOTAL_STEPS)):
-    # Escreve o estado no arquivo .xyz no primeiro e nos passos seguintes
-    SRTF.xyz_file_writer(output_file, positions, velocities, step)
+
+    SRH.xyz_file_writer(output_file, particles, step)
     
-    # Executa um passo de integração completo
-    # A função `tf_integration_step` é compilada pelo TensorFlow para alta performance
     new_pos, new_vel, new_acc = SRTF.tf_integration_step(
-        positions, velocities, accelerations, masses, DT, 
+        positions_tf, velocities_tf, accelerations_tf, masses_tf, DT,
         NATURAL_DISTANCE, K_SPRING, B_DAMP, MIN_PARTICLE_DISTANCE
     )
     
-    # Atualiza o estado das variáveis da simulação
-    positions.assign(new_pos)
-    velocities.assign(new_vel)
-    accelerations.assign(new_acc)
+    # Escreve o estado atual no arquivo .xyz usando a lista de objetos.
+    # Atualize os tensores principais com os novos resultados.
+    positions_tf.assign(new_pos)
+    velocities_tf.assign(new_vel)
+    accelerations_tf.assign(new_acc)
 
-    # Coleta dados para o gráfico
+    # if step == 2500:
+    #     velocities_tf[0].assign([50, 15])
+
+    # Sincronização: Atualize os objetos Python com os novos dados dos tensores.
+    SRH.sync_tensors_to_objects(particles, positions_tf, velocities_tf, accelerations_tf)
+
+    # Coleta de dados para o gráfico
     if NUM_PARTICLES >= 2:
-        # tf.norm calcula a distância euclidiana diretamente
-        relative_vector = positions[1] - positions[0]
-        current_relative_distance = tf.norm(relative_vector)
-        # .numpy() converte o tensor de volta para um valor Python/NumPy
-        relative_distances_history.append(current_relative_distance.numpy())
+        p1 = particles[5]
+        p2 = particles[6]
+        dx_rel = p2.x - p1.x
+        dy_rel = p2.y - p1.y
+        current_relative_distance = np.sqrt(dx_rel**2 + dy_rel**2)
+        relative_distances_history.append(current_relative_distance)
         time_points.append(step * DT)
 
-print("Simulação com TensorFlow concluída!")
-
-# Geração do gráfico da posição relativa
+# Geração do gráfico
 if NUM_PARTICLES >= 2:
-    SRTF.plot_relative_distance(NATURAL_DISTANCE, time_points, relative_distances_history, "posicao_relativa_p1_p2_tf.png")
-    print("Gráfico salvo em 'graphs/posicao_relativa_p1_p2_tf.png'")
+    filename = f'relative_distance_hybrid.png'
+    SRH.plot_relative_distance(NATURAL_DISTANCE, time_points, relative_distances_history, filename)
+    print(f"Gráfico salvo em 'graphs/relative_distance_hybrid.png'")
+
+print("Simulação Híbrida concluída!")
+

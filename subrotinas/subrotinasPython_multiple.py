@@ -42,12 +42,11 @@ def spring_force(particle1, particle2, natural_distance, k, min_distance):
     Retorna as componentes x e y da força que particle2 exerce sobre particle1.
     """
     # Vetor relativo de particle1 para particle2
+    epsilon = 1e-9
     dx = particle2.x - particle1.x
     dy = particle2.y - particle1.y
     
     particles_distance = np.sqrt(dx**2 + dy**2)
-    
-    epsilon = 1e-9
 
     if particles_distance < epsilon: # Usa epsilon para verificar se a distância é muito pequena
         return 0.0, 0.0
