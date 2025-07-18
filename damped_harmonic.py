@@ -1,5 +1,6 @@
 import numpy as np
-import subrotinas.subrotinasPython as SRP
+import subrotinas.subrotinasPython_single as SRP
+from tqdm import tqdm
 from particle import Particle
 
 # Defining time steps
@@ -13,7 +14,6 @@ Y_INTERVAL = (-5, 5)
 # Defining spring constants
 NATURAL_DISTANCE = 9
 K_SPRING = 20
-
 B_DAMP = 0.1
 
 # Defining particles
@@ -33,7 +33,7 @@ output_file = SRP.create_output_folder()
 open(output_file, "w").close() # Clean output file
 
 # Start loop
-for step in range(TOTAL_STEPS):
+for step in tqdm(range(TOTAL_STEPS)):
     if step == 0:
         SRP.xyz_file_writer(output_file, particles, step)
     
@@ -49,5 +49,5 @@ for step in range(TOTAL_STEPS):
 
     SRP.xyz_file_writer(output_file, particles, step)
 
-    print(step)
+    # print(step)
 

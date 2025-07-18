@@ -1,9 +1,9 @@
 import subrotinas.subrotinasFortran as SRF
-import subrotinas.subrotinasPython as SRP
+import subrotinas.subrotinasPython_single as SRP
 from particle import Particle
 
 # Constantes da mola
-NATURAL_DISTANCE = 9
+NATURAL_DISTANCE = 4
 K_SPRING = 20 
 B_SPRING = 0.1
 
